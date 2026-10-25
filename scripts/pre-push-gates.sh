@@ -224,7 +224,7 @@ done
 # never delete a user's plugin directory to do it.
 if [ -f install.sh ]; then
   grep -q 'canonical' install.sh || { echo "  ✖ packaging-gate: install.sh does not install the canonical/ package"; packaging_fail=1; fail=1; }
-  if grep -q -- '--delete' install.sh; then
+  if grep -v '^[[:space:]]*#' install.sh | grep -q -- '--delete'; then
     echo "  ✖ packaging-gate: install.sh uses a destructive delete against a user's plugin directory"
     packaging_fail=1; fail=1
   fi
