@@ -59,9 +59,13 @@ if [ -z "$TRACKED" ]; then
 fi
 
 # ------------------------------------------------------------- secrets-gate --
+# The gate's own pattern strings are excluded from its content scans: a gate
+# that reads its own regex is a gate that can never pass. Everything else in
+# the repo is scanned.
+SCAN_EXCLUDE=':!scripts/pre-push-gates.sh'
 secret_hits=$(git grep -I -n -E \
   '(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|npm_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9]{24,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----' \
-  -- . 2>/dev/null | head -10)
+  -- . "$SCAN_EXCLUDE" 2>/dev/null | head -10)
 if [ -n "$secret_hits" ]; then
   echo "  ✖ secrets-gate: credential material is in tracked files:"
   printf '%s\n' "$secret_hits" | sed 's/^/      /'
@@ -186,7 +190,7 @@ fi
 # Doctrine: no published prices. The board is free, forever; a price in a public
 # JSON file is the machine surface nobody reads before it becomes a claim.
 price_hits=$(git grep -I -n -E '[$€£][[:space:]]?[0-9]+(\.[0-9]{2})?( |$|,|\.|"|;)' -- \
-  '*.json' '*.md' '*.mjs' '*.py' 2>/dev/null | grep -v -E '(price|amount|cost)[^ ]* *[=:][^ ]* *["'"'"']?0(\.0+)?["'"'"']?$' | head -10)
+  '*.json' '*.md' '*.mjs' '*.py' "$SCAN_EXCLUDE" 2>/dev/null | grep -v -E '(price|amount|cost)[^ ]* *[=:][^ ]* *["'"'"']?0(\.0+)?["'"'"']?$' | head -10)
 if [ -n "$price_hits" ]; then
   echo "  ✖ price-gate: a published price is in a tracked file:"
   printf '%s\n' "$price_hits" | sed 's/^/      /'
@@ -200,7 +204,7 @@ fi
 # self-retracted and must not come back.
 doctrine_hits=$(git grep -I -n -i -E \
   'csoai[- ]certified|certified by csoai|guaranteed accuracy|100% accurate|byzantine consensus|33-agent' \
-  -- . 2>/dev/null | head -10)
+  -- . "$SCAN_EXCLUDE" 2>/dev/null | head -10)
 if [ -n "$doctrine_hits" ]; then
   echo "  ✖ doctrine-gate: a forbidden claim is in a tracked file:"
   printf '%s\n' "$doctrine_hits" | sed 's/^/      /'
