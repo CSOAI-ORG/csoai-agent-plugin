@@ -220,6 +220,16 @@ for junk in $(git ls-files | grep -E '(^|/)\.DS_Store$|(^|/)node_modules/|\.pyc$
 done
 [ -f LICENSE ] || { echo "  ✖ packaging-gate: LICENSE is missing"; packaging_fail=1; fail=1; }
 [ -f README.md ] || { echo "  ✖ packaging-gate: README.md is missing"; packaging_fail=1; fail=1; }
+# The installer must install the PACKAGE (canonical/), not the repository root, and it must
+# never delete a user's plugin directory to do it.
+if [ -f install.sh ]; then
+  grep -q 'canonical' install.sh || { echo "  ✖ packaging-gate: install.sh does not install the canonical/ package"; packaging_fail=1; fail=1; }
+  if grep -q -- '--delete' install.sh; then
+    echo "  ✖ packaging-gate: install.sh uses a destructive delete against a user's plugin directory"
+    packaging_fail=1; fail=1
+  fi
+  [ -x install.sh ] || { echo "  ✖ packaging-gate: install.sh is not executable"; packaging_fail=1; fail=1; }
+fi
 pkg_version=$(python3 -c 'import json;print(json.load(open("package.json")).get("version",""))' 2>/dev/null)
 man_version=$(python3 -c 'import json;print(json.load(open("canonical/.minimax-plugin/plugin.json")).get("version",""))' 2>/dev/null)
 if [ "$pkg_version" != "$man_version" ]; then

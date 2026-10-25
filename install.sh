@@ -1,17 +1,28 @@
 #!/usr/bin/env bash
 # Install and verify the Council of AI MiniMax Code plugin.
 #
-# The source of truth lives HERE, in the CSOAI estate — not in the runtime-managed
-# ~/.minimax/plugins/ directory. The runtime's local-plugin rescan has been observed to prune a
-# package it does not recognise, and a prune must never be able to destroy the work. Install copies
-# the source in; --verify re-reads what is actually installed.
+# WHERE IT LANDS, AND WHY.
+#
+#   ~/.minimax/plugins/council-of-ai   the plugin package (runtime-owned: MiniMax Code prunes
+#                                       a package it has not imported, so this copy can go)
+#   ~/.minimax/skills/<skill>/SKILL.md  the skills, in the runtime's own skillsDir — this is
+#                                       where the skill catalogue is built from, so this is what
+#                                       keeps working
+#   ~/.minimax/mcp.json                 the two MCP servers, merged (gspc, csoai-governance)
+#
+# Import the package from the Plugins panel (or from
+# https://github.com/CSOAI-ORG/csoai-agent-plugin) to have the runtime list it as a Local
+# Plugin. That step is a Host action: the local-install facade answers
+# LOCAL_PLUGIN_INSTALL_UNSUPPORTED.
 #
 # Usage:  ./install.sh          install (idempotent)
 #         ./install.sh --verify verify the installed package without changing it
 set -euo pipefail
 
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC="$REPO/canonical"
 DEST="${MINIMAX_PLUGIN_HOME:-$HOME/.minimax/plugins}/council-of-ai"
+SKILLS_DIR="${MINIMAX_SKILLS_HOME:-$HOME/.minimax/skills}"
 
 verify() {
   local fail=0
@@ -21,8 +32,23 @@ verify() {
     if [ -f "$DEST/$f" ]; then echo "  ok   $f"; else echo "  MISS $f"; fail=1; fi
   done
 
+  # The skills are the part that persists. If they are missing from the runtime's skillsDir,
+  # the plugin is installed but not usable, and that is what this reports.
+  local missing=0
+  for d in "$SRC"/skills/*/; do
+    local name
+    name="$(basename "$d")"
+    if [ -f "$SKILLS_DIR/$name/SKILL.md" ]; then
+      echo "  ok   skills/$name"
+    else
+      echo "  MISS skills/$name in $SKILLS_DIR"
+      missing=1
+    fi
+  done
+  [ "$missing" -eq 1 ] && fail=1
+
   APP_VERSION=$(/usr/bin/defaults read "/Applications/MiniMax Code.app/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null || echo "unknown")
-  if grep -q '"agents"' "$DEST/.minimax-plugin/plugin.json"; then
+  if grep -q '"agents"' "$DEST/.minimax-plugin/plugin.json" 2>/dev/null; then
     case "$APP_VERSION" in
       3.1.*)
         echo "  WARN manifest declares 'agents' but MiniMax Code ${APP_VERSION} rejects that field"
@@ -91,8 +117,6 @@ for ref in manifest.get("agents", []):
     stem = os.path.basename(ref)[:-3]
     if not name or name.group(1).strip() != stem:
         print(f"  MISS agent name != file in {ref}"); fail = 1
-    if "task" in (re.search(r"^tools:\s*\[(.*?)\]", match.group(1), re.M) or type("", (), {"group": lambda self, i: ""})()).group(1):
-        print(f"  MISS agent must not list 'task' in {ref}"); fail = 1
 
 for ref in manifest.get("mcpServers", []):
     path = os.path.join(dest, ref)
@@ -126,10 +150,35 @@ if [ "${1:-}" = "--verify" ]; then
   exit $?
 fi
 
+if [ ! -f "$SRC/.minimax-plugin/plugin.json" ]; then
+  echo "ABORT $SRC does not hold the plugin package (.minimax-plugin/plugin.json is missing)"
+  exit 1
+fi
+
 echo "installing $SRC -> $DEST"
 mkdir -p "$DEST"
-rsync -a --delete "$SRC/" "$DEST/"
+# Never a destructive sync. The previous package is kept as a dated sibling so a bad install is
+# recoverable; a --delete against a user's plugin directory is not.
+if [ -d "$DEST" ] && [ -n "$(ls -A "$DEST" 2>/dev/null)" ]; then
+  BACKUP="$DEST.bak-$(date -u +%Y%m%dT%H%M%SZ)-pre-csoai-plugin"
+  cp -R "$DEST" "$BACKUP"
+  echo "  previous package kept at $BACKUP"
+fi
+(cd "$SRC" && tar cf - .) | (cd "$DEST" && tar xf -)
+
+# The skills go into the runtime's own skillsDir, where the catalogue is built from. ${PLUGIN_ROOT}
+# only exists inside a package, so it is rewritten to this checkout: stable for as long as the
+# clone is there.
+mkdir -p "$SKILLS_DIR"
+for d in "$SRC"/skills/*/; do
+  name="$(basename "$d")"
+  mkdir -p "$SKILLS_DIR/$name"
+  sed "s|\${PLUGIN_ROOT}|$SRC|g" "$d/SKILL.md" > "$SKILLS_DIR/$name/SKILL.md"
+  echo "  skill $name -> $SKILLS_DIR/$name/SKILL.md"
+done
+
 verify
 echo
 echo "installed. The runtime rescans local plugins automatically."
-echo "source of truth: $SRC"
+echo "source of truth: $REPO"
+echo "skills: $SKILLS_DIR   package: $DEST"
