@@ -1,0 +1,12 @@
+{
+  "name": "csoai-agent-plugin",
+  "version": "0.2.0",
+  "description": "Council of AI agent plugin — independent AI-behaviour measurement for any AI platform. Pull the live GSPC board, verify Ed25519 measurement cards, seal artifacts, census the local harness. Measurement, never certification.",
+  "bin": { "csoai-agent-plugin": "./bin/cli.mjs" },
+  "files": ["bin", "canonical", "platforms.json", "factory.py", "install.sh", "README.md"],
+  "license": "SEE LICENSE IN README.md",
+  "homepage": "https://councilof.ai/api/plugin",
+  "repository": { "type": "git", "url": "git+https://github.com/CSOAI-ORG/csoai-agent-plugin.git" },
+  "keywords": ["ai", "measurement", "governance", "councilof-ai", "csoai", "agent-plugin", "skills", "mcp"],
+  "engines": { "node": ">=18" }
+}

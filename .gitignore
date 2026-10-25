@@ -1,0 +1,4 @@
+node_modules/
+platforms/
+receipts/
+__pycache__/
