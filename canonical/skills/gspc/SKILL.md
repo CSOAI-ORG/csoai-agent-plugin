@@ -17,7 +17,9 @@ Prefer the MCP server `gspc` (declared by this plugin, `https://councilof.ai/mcp
 Fallback, plain HTTP:
 
 ```bash
-node "${PLUGIN_ROOT}/scripts/gspc-board.mjs"
+node "${PLUGIN_ROOT}/scripts/gspc-board.mjs"                 # the board, once
+node "${PLUGIN_ROOT}/scripts/gspc-board.mjs" --axis=governance  # one axis + how far to trust it
+node "${PLUGIN_ROOT}/scripts/gspc-board.mjs" --watch=10     # live: re-read and print only what changed
 curl -sS https://councilof.ai/api/gspc
 ```
 
@@ -32,8 +34,21 @@ assume it.** Re-fetch every time. Never quote a remembered count as live.
 4. A separate list of UNMEASURED axes — names only. Never zeros, never "pending pass".
 5. `totals.separation_public_count` — SEPARATED / TIE / UNTESTED are three states and none is folded
    into another. UNTESTED is not a tie. A point-estimate lead is not a measured advantage.
-6. If the user named one axis, fetch that row alone and print its `separation_method` and
-   `separation_evidence.source` beside the number.
+6. If the user named one axis, fetch that row alone and print, BESIDE the number, the things that
+   say how much the number can bear:
+   - `mde` — the axis's own resolution ("this axis can only detect a difference of ~X or larger").
+     A reader who sees only an accuracy is being asked to trust more than the number can bear.
+   - `interval` — labelled annotation only; never folded into separation.
+   - `separation_method` and `separation_p` — the test and the number behind the state.
+   - `separation_evidence.source` — where the rows came from.
+   - `leader_card_state` — if it says `CARD_RECORDS_A_DIFFERENT_MEASUREMENT`, say so plainly: the
+     signed card records a DIFFERENT measurement and does not back the number shown.
+   - `fleet_mean` / `mean_harm` / `cvar05_harm` — the fleet context, so a leader is read against
+     the fleet and not in isolation.
+   - `peritem_file_sha256` and `measurement_time` (with its precision) — the provenance.
+7. When the user wants to watch the record move, use `--watch`. It prints the first read and then
+   only what CHANGED. A board read once is a snapshot; the point of a measurement body is that the
+   record moves, and how.
 
 ## The separation rule, in one line
 
