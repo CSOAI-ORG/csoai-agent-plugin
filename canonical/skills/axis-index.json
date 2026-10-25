@@ -1,0 +1,174 @@
+{
+  "schema": "csoai.axis-skills/0.1",
+  "source": "https://councilof.ai/api/gspc",
+  "board_schema": "csoai.gspc-axes/0.5",
+  "board_sha256": "67c0f69ecefb89053bfd5ef72487de07be52c0592e127334d2eb62e178194b72",
+  "axis_count": 33,
+  "axes": [
+    {
+      "axis": "governance",
+      "skill": "gspc-axis-governance",
+      "description": "EU AI Act risk-tier classification; bench GovBench; model-comparison"
+    },
+    {
+      "axis": "safety",
+      "skill": "gspc-axis-safety",
+      "description": "calibrated refusal on paired requests; bench DefBench; model-comparison"
+    },
+    {
+      "axis": "provenance",
+      "skill": "gspc-axis-provenance",
+      "description": "Article 50 marking survival by validity; bench ProvBench; model-comparison"
+    },
+    {
+      "axis": "continuity",
+      "skill": "gspc-axis-continuity",
+      "description": "post-quantum status of a cryptographic assumption; bench PQCBench; model-comparison"
+    },
+    {
+      "axis": "conformance",
+      "skill": "gspc-axis-conformance",
+      "description": "MCP tool conformance; bench MCPBench; model-comparison"
+    },
+    {
+      "axis": "openness",
+      "skill": "gspc-axis-openness",
+      "description": "licence reasoning versus intended use; bench OSSBench; model-comparison"
+    },
+    {
+      "axis": "machinery-conformity",
+      "skill": "gspc-axis-machinery-conformity",
+      "description": "Machinery Reg self-evolving safety-function classification (PART_A / OUT_OF_SCOPE / NOT_SAFETY_FUNCTION); bench MachBench; model-comparison"
+    },
+    {
+      "axis": "care",
+      "skill": "gspc-axis-care",
+      "description": "care-cost (protect × help) under paired conduct scenarios; bench CareBench; model-comparison"
+    },
+    {
+      "axis": "cross-reality",
+      "skill": "gspc-axis-cross-reality",
+      "description": "autonomous agent action authority (PROCEED / CONFIRM / REFUSE); bench XRAIV; model-comparison"
+    },
+    {
+      "axis": "detector-interop",
+      "skill": "gspc-axis-detector-interop",
+      "description": "cross-detector watermark interoperability matrix; bench DetBench; model-comparison"
+    },
+    {
+      "axis": "art5-safeguard",
+      "skill": "gspc-axis-art5-safeguard",
+      "description": "EU AI Act Article 5 prohibited-practice trip; bench Art5Bench; model-comparison"
+    },
+    {
+      "axis": "swarm",
+      "skill": "gspc-axis-swarm",
+      "description": "multi-agent coordination safety; bench SwarmBench v2b; model-comparison"
+    },
+    {
+      "axis": "affect",
+      "skill": "gspc-axis-affect",
+      "description": "emotional & embodied safety (manipulation / disclosure / vulnerability); bench AffectBench; model-comparison"
+    },
+    {
+      "axis": "jail",
+      "skill": "gspc-axis-jail",
+      "description": "escape-attempt detection on a 71-row gold bank of 27 distinct inputs (38 ESCAPE / 33 BENIGN rows) — layer 2 of 2; bench GoldBank-Detector; model-comparison"
+    },
+    {
+      "axis": "effect-binding",
+      "skill": "gspc-axis-effect-binding",
+      "description": "does authorization bind to the request the server executes, or only to the tool call the agent declared; bench EffectBench v0.1 (server probe); deterministic-facts"
+    },
+    {
+      "axis": "provenance-controls",
+      "skill": "gspc-axis-provenance-controls",
+      "description": "on-chain issuer control facts (allowlisting / freeze capability / identity domain); bench ChainFacts; deterministic-facts"
+    },
+    {
+      "axis": "reserve-attestation",
+      "skill": "gspc-axis-reserve-attestation",
+      "description": "is third-party reserve-attestation language on a retrieved issuer page? (PASS/FAIL/UNCHECKABLE); bench ReserveFacts; deterministic-facts"
+    },
+    {
+      "axis": "regulatory-framework",
+      "skill": "gspc-axis-regulatory-framework",
+      "description": "is the governing regime declared and confirmable (NYDFS / MiCA / BACEN / Reg D ...)? (PASS/FAIL/UNCHECKABLE); bench RegimeFacts; deterministic-facts"
+    },
+    {
+      "axis": "distribution-integrity",
+      "skill": "gspc-axis-distribution-integrity",
+      "description": "reader classification + chain supply + holder count (PASS/FAIL/UNCHECKABLE); bench DistributionFacts; deterministic-facts"
+    },
+    {
+      "axis": "custody-disclosure",
+      "skill": "gspc-axis-custody-disclosure",
+      "description": "are a custodian and an auditor named and confirmable? (PASS/FAIL/UNCHECKABLE each); bench CustodyFacts; deterministic-facts"
+    },
+    {
+      "axis": "ai-adoption-components",
+      "skill": "gspc-axis-ai-adoption-components",
+      "description": "cited EU AI-adoption series (not an index); bench Eurostat; deterministic-facts"
+    },
+    {
+      "axis": "labour-components",
+      "skill": "gspc-axis-labour-components",
+      "description": "cited EU labour series (not an index); bench Eurostat; deterministic-facts"
+    },
+    {
+      "axis": "humanoid-labour-index",
+      "skill": "gspc-axis-humanoid-labour-index",
+      "description": "named vendor publishes a dated deployment count on a stable URL? Y/N; bench Disclosure; deterministic-facts"
+    },
+    {
+      "axis": "lab-practice",
+      "skill": "gspc-axis-lab-practice",
+      "description": "does an AI lab publish its evaluations, safety framework and incident reports; bench pending frozen bank; declared-slot"
+    },
+    {
+      "axis": "company-practice",
+      "skill": "gspc-axis-company-practice",
+      "description": "does a non-lab AI company do what its public material says; bench pending frozen bank; declared-slot"
+    },
+    {
+      "axis": "measurer-integrity",
+      "skill": "gspc-axis-measurer-integrity",
+      "description": "does an evaluation organisation publish methods, test sets and reproducible results; bench pending frozen bank; declared-slot"
+    },
+    {
+      "axis": "harness-fidelity",
+      "skill": "gspc-axis-harness-fidelity",
+      "description": "does the same model on the same bank score the same across evaluation harnesses; bench pending frozen method; declared-slot"
+    },
+    {
+      "axis": "interop-conformance",
+      "skill": "gspc-axis-interop-conformance",
+      "description": "does an interoperability/standards group publish specs, test suites and conformance records; bench pending frozen bank; declared-slot"
+    },
+    {
+      "axis": "humanoid-deployment",
+      "skill": "gspc-axis-humanoid-deployment",
+      "description": "what a humanoid lab has publicly deployed, checked against a public registry; bench pending frozen registry; declared-slot"
+    },
+    {
+      "axis": "regulator-transparency",
+      "skill": "gspc-axis-regulator-transparency",
+      "description": "factual presence checks on public artefacts (guidance, registry, methodology, consultation, contact route); no scores, no ratings; bench pending frozen check bank; declared-slot"
+    },
+    {
+      "axis": "interpretability-reproducibility",
+      "skill": "gspc-axis-interpretability-reproducibility",
+      "description": "what an interpretability group publishes and whether it can be reproduced; bench pending frozen bank; declared-slot"
+    },
+    {
+      "axis": "claim-maintenance",
+      "skill": "gspc-axis-claim-maintenance",
+      "description": "at each scheduled re-read, is a captured public claim still served unchanged, changed with disclosure, changed silently, withdrawn or unreachable; says nothing about whether the claim is true; bench pending gated re-read wave (>=30 claims); declared-slot"
+    },
+    {
+      "axis": "serving-fidelity",
+      "skill": "gspc-axis-serving-fidelity",
+      "description": "does an endpoint or serving configuration claiming model M behave like M's reference serving on a frozen bank; bench pending frozen bank; declared-slot"
+    }
+  ]
+}

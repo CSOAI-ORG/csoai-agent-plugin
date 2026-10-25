@@ -65,6 +65,18 @@ CSOAI-owned model names appear as deterministic aliases on the public board (`co
 model names are published as the vendor's own ids. An alias is not a different model; it is the same
 model under a name the board is willing to publish.
 
+## One axis, one door
+
+Every board row has its own skill: `gspc-axis-<axis-id>` — one per axis, each standing alone
+with that axis's identity and the method for reading it (its resolution, its separation
+sentence, the measured-on precision, the card state, the rows file). Use the axis skill when
+the question names one axis; use this skill for the board as a whole.
+
+They cannot disagree, because the per-axis skills carry **no numbers** — only how to read them
+— and the live board carries the numbers. `skills/axis-index.json` is the catalogue: the axis
+ids, their one-line identity, and the sha256 of the board snapshot the skills were generated
+from.
+
 ## Forbidden
 
 - Filling an empty cell

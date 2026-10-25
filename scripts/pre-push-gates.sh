@@ -14,6 +14,7 @@
 #   price-gate      no public price (CSOAI doctrine: no published prices)
 #   doctrine-gate   no certification claim, no self-scoring, no retracted claim
 #   packaging-gate  no junk, no lockfile secrets, licence and version present
+#   axis-skill-gate one skill per GSPC axis, no orphans, no remembered numbers
 #
 # Install as a pre-push hook:
 #     ln -sf ../../scripts/pre-push-gates.sh .git/hooks/pre-push
@@ -238,10 +239,18 @@ if [ "$pkg_version" != "$man_version" ]; then
 fi
 [ "$packaging_fail" -eq 0 ] && echo "  ✓ packaging-gate clean"
 
+# --------------------------------------------------------- axis-skill-gate --
+# One axis, one door. The plugin ships a generated skill per GSPC board axis; this gate
+# proves there is exactly one skill per axis, no orphan, no skill without an axis, and that
+# each skill teaches how to READ the axis rather than carrying a remembered number.
+if ! python3 scripts/axis-skill-gate.py; then
+  fail=1
+fi
+
 if [ "$fail" -ne 0 ]; then
   echo
   echo "  Push blocked. These are the checks that make a public package safe to run."
   exit 1
 fi
-echo "  ✓ secrets-gate + json-gate + manifest-gate + price-gate + doctrine-gate + packaging-gate clean"
+echo "  ✓ secrets-gate + json-gate + manifest-gate + price-gate + doctrine-gate + packaging-gate + axis-skill-gate clean"
 exit 0

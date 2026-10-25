@@ -115,8 +115,26 @@ def render_rules_md(skill: str) -> str:
     return "\n".join(out)
 
 
+AXIS_SKILL_PREFIX = "gspc-axis-"
+
+
+def axis_catalogue() -> list:
+    """The per-axis doors, one line each, from the generated index.
+
+    ArtCraft's hub pattern: the apps stand alone, but the catalogue is what a host reads
+    first. Inlining 33 axis bodies into one AGENTS.md would add ~2000 lines to every
+    session's context for no gain — the agent needs ONE axis, and opens that one file.
+    """
+    path = os.path.join(CANONICAL, "skills", "axis-index.json")
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding="utf-8") as handle:
+        index = json.load(handle)
+    return index.get("axes") or []
+
+
 def render_agent_file(skills: list) -> str:
-    """Every skill inline, for a host that reads one instruction file."""
+    """Core skills inline; per-axis doors as a catalogue, for a host that reads one file."""
     parts = [
         "# Council of AI — measurement instructions",
         "",
@@ -133,7 +151,8 @@ def render_agent_file(skills: list) -> str:
         "---",
         "",
     ]
-    for skill in skills:
+    core = [s for s in skills if not s.startswith(AXIS_SKILL_PREFIX)]
+    for skill in core:
         front, body = split_frontmatter(read_skill(skill))
         name = frontmatter_value(front, "name") or skill
         description = frontmatter_value(front, "description") or skill
@@ -142,6 +161,24 @@ def render_agent_file(skills: list) -> str:
         parts.append(f"**When to use:** {description}")
         parts.append("")
         parts.append(body.lstrip("\n"))
+        parts.append("")
+        parts.append("---")
+        parts.append("")
+
+    catalogue = axis_catalogue()
+    if catalogue:
+        parts.append("## Per-axis doors — one per board row")
+        parts.append("")
+        parts.append(
+            f"{len(catalogue)} per-axis skills ship with this plugin — one per GSPC board row. Each stands"
+        )
+        parts.append(
+            "alone: it carries that axis's identity and how to read it, and never a remembered number."
+        )
+        parts.append("Read the ONE you need; do not inline them all.")
+        parts.append("")
+        for entry in catalogue:
+            parts.append(f"- `{entry.get('skill')}` — {entry.get('description')}")
         parts.append("")
         parts.append("---")
         parts.append("")
