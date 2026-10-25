@@ -59,9 +59,10 @@
       },
       "install": {
         "type": "copy-tree",
-        "to": "~/.minimax/plugins/council-of-ai"
+        "to": "~/.minimax/plugins/council-of-ai",
+        "skills_dir": "~/.minimax/skills"
       },
-      "note": "MiniMax Code 3.1.4 prunes a local plugin directory that it has not registered. Install the tree, then register it through the desktop local API (POST /minimax-desktop/api/v1/plugins/:plugin_name/install). See README."
+      "note": "MiniMax Code 3.1.4 prunes a local plugin directory that it has not registered: the copy under ~/.minimax/plugins is runtime-owned and is removed on the next rescan. The runtime's own skillsDir is ~/.minimax/skills, so the skills are installed there as well and survive. Import the public package from the Plugins panel to have the runtime list it as a Local Plugin; the local-install facade answers LOCAL_PLUGIN_INSTALL_UNSUPPORTED, so that step is a Host action."
     },
     {
       "id": "claude",

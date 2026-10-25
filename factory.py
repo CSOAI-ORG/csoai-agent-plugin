@@ -474,6 +474,30 @@ def install_one(matrix: dict, platform: dict) -> dict:
                     os.makedirs(os.path.dirname(target), exist_ok=True)
                     shutil.copy2(full, target)
                     result["installed"].append(target)
+            # Some hosts read their skills from their own user-skill directory and treat the
+            # package directory as runtime-owned. MiniMax Code does exactly that: it prunes
+            # ~/.minimax/plugins/<name>/ on the next rescan, while ~/.minimax/skills is the
+            # runtime's own skillsDir. Installing the skills there is what makes the plugin
+            # work after the package copy is gone.
+            skills_dir = install.get("skills_dir")
+            if skills_dir:
+                skill_root = expand(skills_dir)
+                for skill in canonical_skills():
+                    src_skill = os.path.join(CANONICAL, "skills", skill, "SKILL.md")
+                    if not os.path.isfile(src_skill):
+                        continue
+                    with open(src_skill, encoding="utf-8") as handle:
+                        body = handle.read()
+                    # ${PLUGIN_ROOT} only exists inside a plugin package. A standalone skill gets
+                    # the canonical source root instead: it is stable for as long as this package
+                    # is installed, where the runtime-owned package directory may be pruned.
+                    body = body.replace("${PLUGIN_ROOT}", CANONICAL)
+                    target_dir = os.path.join(skill_root, skill)
+                    os.makedirs(target_dir, exist_ok=True)
+                    target = os.path.join(target_dir, "SKILL.md")
+                    with open(target, "w", encoding="utf-8") as handle:
+                        handle.write(body)
+                    result["installed"].append(target)
         elif kind == "rules-md":
             for skill in canonical_skills():
                 full = os.path.join(src, "skills", f"{skill}.md")

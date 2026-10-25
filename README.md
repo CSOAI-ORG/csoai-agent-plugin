@@ -29,6 +29,17 @@ python3 factory.py install-all
 | MCP | `gspc` — the live board, `https://councilof.ai/mcp` · `csoai-governance` — seal and verify bytes |
 | Hooks (MiniMax Code) | `SessionStart` live board context · `UserPromptSubmit` outward-gate nudge · `PreToolUse` bash guard · `SessionEnd` receipt |
 
+### Where it lands on MiniMax Code
+
+MiniMax Code treats `~/.minimax/plugins/<name>/` as runtime-owned: a package copied there is
+pruned on the next rescan unless the Host has imported it through the Plugins panel. So the
+installer writes the skills to `~/.minimax/skills/` as well — that directory is the runtime's own
+`skillsDir`, and it is where the skill catalogue is built from. The MCP servers are merged into
+`~/.minimax/mcp.json`, so they are live in every session. Import the package from the Plugins
+panel (or `https://github.com/CSOAI-ORG/csoai-agent-plugin`) to have the runtime list it as a
+Local Plugin; that step is a Host action, because the local-install facade answers
+`LOCAL_PLUGIN_INSTALL_UNSUPPORTED`.
+
 ## Platform families
 
 One canonical source; `platforms.json` is the only list. The factory renders the right package for
