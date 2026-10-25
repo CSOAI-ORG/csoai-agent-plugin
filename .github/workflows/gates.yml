@@ -1,0 +1,42 @@
+name: gates
+
+# The same suite the pre-push hook runs locally, run again on every push and
+# every pull request. A public plugin is a distribution channel: the checks
+# that protect it should not depend on the machine that pushed it.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: gate selftest
+        run: bash scripts/pre-push-gates.sh --selftest
+
+      - name: safety suite
+        run: bash scripts/pre-push-gates.sh
+
+      - name: package dry run
+        run: npm pack --dry-run
+
+      - name: package contents
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e '
+            const p = require("./pack.json")[0];
+            const files = p.files.map((f) => f.path);
+            const junk = files.filter((f) => /\/\.DS_Store$|node_modules\//.test(f));
+            if (junk.length) { console.error("junk in the package:", junk); process.exit(1); }
+            console.log(files.length + " files in the tarball");
+          '
